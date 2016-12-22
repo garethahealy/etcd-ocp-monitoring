@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: etcd2-onramp-hawkular-agent
+data:
+  hawkular-openshift-agent: |
+    endpoints:
+    - type: prometheus
+      protocol: "https"
+      port: 9779
+      path: /metrics
+      collection_interval_secs: 5
+      metrics:
+      - name: etcd_http_received_total
+        type: counter
+      - name: etcd_http_failed_total
+        type: counter

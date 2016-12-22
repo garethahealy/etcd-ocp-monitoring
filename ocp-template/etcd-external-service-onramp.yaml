@@ -1,0 +1,50 @@
+---
+apiVersion: v1
+kind: Template
+metadata:
+  labels:
+    provider: fabric8
+    group: etcd2
+  name: etcd-external-service-onramp
+objects:
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    labels:
+      provider: fabric8
+      group: etcd
+    name: ${APP}
+  spec:
+    replicas: 1
+    strategy:
+      type: Recreate
+    template:
+      metadata:
+        annotations:
+          hawkular-openshift-agent: ${HAWKULAR_AGENT_CONFIGMAP}
+        labels:
+          provider: fabric8
+          group: etcd
+      spec:
+        containers:
+        - env:
+          - name: KUBERNETES_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+          image: garethahealy/ocp-external-service-onramp:1.0
+          imagePullPolicy: Always
+          name: ${APP}
+          securityContext:
+            privileged: true
+          ports:
+          - containerPort: 9779
+            name: prometheus
+            protocol: TCP
+    triggers:
+    - type: ConfigChange
+parameters:
+- name: APP
+  value: etcd-external-service-onramp
+- name: HAWKULAR_AGENT_CONFIGMAP
+  value: etcd2-onramp-hawkular-agent
