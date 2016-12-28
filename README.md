@@ -1,6 +1,15 @@
 [![License](https://img.shields.io/hexpm/l/plug.svg?maxAge=2592000)]()
 
 # etcd-ocp-monitoring 
+## Disclaimer
+**Supportability:**
+*If you are a RedHat customer; it is **suggested** you raise a support ticket to clarify the supportability of the below components.
+The below are the views of my own, and not representative of RedHat nor of any communities mentioned.*
+- Hawkular OpenShift Agent is only supported [upstream](http://www.hawkular.org/community/docs/getting-involved/)
+- Docker container image 'ocp-external-service-onramp' [best endeavours](https://github.com/garethahealy/ocp-external-service-onramp/issues)
+- etcd is supported as part of an OCP subscription by [RedHat support](https://access.redhat.com/support/cases), as long as, it has been installed and configured as per the OCP documentation and not tampered with.
+- Hawkular Grafana DataSource is only supported [upstream](https://github.com/hawkular/hawkular-grafana-datasource/issues)
+
 ## Preface
 This blog post is a continuation of [FIS2.0 OCP Monitoring via Hawkular OpenShift Agent](https://github.com/garethahealy/fis2-ocp-monitoring). 
 Before continuing, it is expected that you have completed the steps in the mentioned blog post.
@@ -35,6 +44,8 @@ We want to add the certificates so they can be used by a pod:
     oc volume rc/hawkular-openshift-agent --add --name=etcd-client-crt --type=secret --secret-name=etcd-client-crt --mount-path=/var/run/secrets/custom/etcd-client-crt
     oc volume rc/hawkular-openshift-agent --add --name=etcd-client-key --type=secret --secret-name=etcd-client-key --mount-path=/var/run/secrets/custom/etcd-client-key
 
+And add the keys to the agent, as etcd is mutual auth protected
+
     oc edit configmap hawkular-openshift-agent-configuration
     
     identity:
@@ -55,6 +66,8 @@ Give the default SA privileged SCC and create the config:
 Below should show metrics being collected and stored for etcd
 
     AGENT_POD=$(oc get pod -n openshift-infra | grep hawkular-openshift-agent | cut -d' ' -f1)
-    oc logs -n openshift-infra $AGENT_POD
+    oc logs -n openshift-infra -f $AGENT_POD
     
 Now we can view in grafana.
+
+    oc sa get-token default -n etcd-onramp
