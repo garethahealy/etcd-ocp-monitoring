@@ -25,8 +25,6 @@ objects:
       type: Recreate
     template:
       metadata:
-        annotations:
-          hawkular-openshift-agent: ${HAWKULAR_AGENT_CONFIGMAP}
         labels:
           provider: fabric8
           group: etcd
@@ -46,7 +44,14 @@ objects:
           - containerPort: 9779
             name: prometheus
             protocol: TCP
+          volumeMounts:
+            - mountPath: /run/configmaps/garethahealy.com/hawkular-agent
+              name: ${APP}-hawkular-agent
         serviceAccountName: etcd-external
+        volumes:
+          - name: hawkular-openshift-agent
+            configMap:
+              name: ${HAWKULAR_AGENT_CONFIGMAP}
     triggers:
     - type: ConfigChange
 parameters:
