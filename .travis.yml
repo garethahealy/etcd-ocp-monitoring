@@ -1,7 +1,7 @@
 sudo: required
 dist: trusty
 services:
-  - docker
+- docker
 script:
-  - docker pull garethahealy/centos-pod-pause:1.0
-  - docker pull garethahealy/ocp-external-service-onramp:1.0
+- docker pull garethahealy/centos-pod-pause:1.0
+- docker pull garethahealy/ocp-external-service-onramp:1.0
